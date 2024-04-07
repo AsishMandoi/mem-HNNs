@@ -1,0 +1,19 @@
+{
+  "ExecutionMD": {
+    "TimeCompleted": "2021-11-26  11:54:50",
+    "ExecutionTime": 5.623,
+    "SolutionType": "Optimal",
+    "Solution": 4391,
+    "OneSideOfTheCut": "{  2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 20, 23, 24, 26, 27, 28, 30, 33, 34, 38, 39, 40, 41, 42, 46, 47, 48, 49, 50, 51, 52, 56, 60, 61, 64, 69, 70, 71, 73, 74, 75, 76, 84, 87, 88, 89, 90, 91, 93, 94, 95, 96, 100}",
+    "BabNodes": 5,
+    "RootBound": 4397.92,
+    "MaxWorkersUsed": 3,
+    "NumCores": 12
+  },
+  "GraphMD": {
+    "ObjectTypeString": "Graph",
+    "Vertices": 101,
+    "Edges": 5000,
+    "Density": 0.99
+  }
+}

@@ -1,0 +1,57 @@
+// VerilogA static model of TiO2 Memristors, 10_21_2019 by Reza
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+
+module RRAM(v_top, v_bot, gnd, N, G0);
+inout v_top, v_bot;
+inout gnd;
+input N,G0;
+// G0 and N can be defined as parameters or they can be fetched as voltages! (G0 is in uS)
+electrical v_top,v_bot, gnd, N,G0;
+
+parameter real a0A1=    -2.58u;
+parameter real a1A1=    0.977;
+parameter real a2A1=    0.1166u;
+
+parameter real p0A1=    -1.07u;
+parameter real p1A1=    0.25;
+parameter real p2A1=    22.0n;
+parameter real p3A1=    -1300;
+
+parameter real a0A3=    1.18;
+parameter real a1A3=    6596;
+parameter real a2A3=    1.605m;
+
+parameter real p0A3=    11.7u;
+parameter real p1A3=    1.30;
+parameter real p2A3=    -0.1u;
+parameter real p3A3=     -6500;
+parameter real p4A3=     -2.5m;
+
+real Ig=0;
+real A1=0;
+real A3=0;
+real dA1=0;
+real dA3=0;
+real G0_n=0;
+
+analog begin
+
+@(timer(5p, 1000p)) begin // you can latch new parameters using this
+//@(initial_step) begin
+        G0_n=V(G0,gnd)*(pow(10,-6));
+        A1=a0A1+a1A1*G0_n+a2A1*($temperature-273);
+        A3=a0A3*G0_n+a1A3*pow(G0_n,2)+a2A3*(pow(($temperature-273),-1.33));
+        dA1=p0A1+p1A1*G0_n+p2A1*($temperature-273)+p3A1*pow(G0_n,2);
+        dA3=p0A3+p1A3*G0_n+p2A3*($temperature-273)+p3A3*(pow(G0_n,2))+p4A3*($temperature-273)*G0_n;
+    //    $display("%f",V(N,gnd));
+    //    $display("%f",V(G0,gnd));
+end
+
+    Ig=(A1*V(v_top, v_bot))+A3*(pow(V(v_top, v_bot),3))+V(N,gnd)*(dA1*V(v_top, v_bot)+dA3*(pow(V(v_top, v_bot),3)));
+    I(v_top, v_bot) <+Ig;
+end
+
+endmodule

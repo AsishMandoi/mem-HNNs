@@ -1,0 +1,54 @@
+Versatile stochastic dot product circuits based on nonvolatile memories for high performance neurocomputing and neurooptimization
+
+
+INTRO
+This paper is focussed on the hardware implementation of something they call stochastic dot product circuits, which basically means that along with the calculation of a weighted linear combination it also tries to model the effect of temperature on this calculation, i.e. instead of simply giving an exact output after applying the sigmoid activation function on the input values (which are normalized input currents in this case) in the dot product network, the sigmoidal activation of the neuron also depends on the temperature.
+
+[The input currents carry the weighted linear combination values performed by ohm's law and kirchoff's law.]
+
+This is somewhat close to the idea of simulated annealing, but a little more general in the sense that it also incorporates the implementation of some other techniques like chaotic annealing and an adjustable approach which we'll get to later on. Thus, justifying its versatility.
+
+Their hardware implementation is based on two main non-volatile memory devices: memristors and floating gate memories.
+
+The noise is basically what gives rise to the temperature dependence in the activation function. They also claim to be able to scale the weights/conductances during the operation of the circuit.
+
+
+MOTIVATION & PRIOR WORKS
+
+Why do we need a hardware that calculates dot-products?
+- Dot product calculation is very common among a wide range of areas in computing.
+There have several demonstrations of high-performance dot-product circuits using metal oxide memristors, phase-change memories, and floating-gate memories.
+- Dot-product circuits are capable of a class of operations called vector matrix multiplication way faster and in an more efficent manner than the current day CPUs.
+
+Why is stochastic implementation necessary?
+- Inherent stochastic nature of our brains, comes down to the stochastic gating of ions in the neurons leading to probabilistic synapses acting as a source of randomness.
+
+- The reason why I think it is important is because. The reason behind using probabilistic algorithms rather than deterministic algorithms is this:
+By definition of NP-completeness, they cannot be solved in polynomial time using a deterministic algorithm, but they can be solved using a non-deterministic machine. A stochastic model as ours could act as a non-deterministic machine, thus giving a faster average running time, with a small probability of failure.
+
+[They are not really new after all. e.g.: Stochastic GD]
+
+[Deterministic: Given the same problem configuration, the answer will always remain the same, no matter how many times it is asked]
+
+NOISE CHARACTERIZATION AND WORKING
+<see slide>
+Both the error functions approximate the sigmoid function 1/(1+exp(-x)) with less than 10% relative error.
+[[Some minor, unwanted SNR dependence on the input current is due to the artifacts of the experimental setup.]]
+
+DEMONSTRATING VERSATILITY
+Baseline (Simple HNN), Adjustable, Chaotic, Stochastic HNN
+Nodes are being updated probabilistically. However in a normal neural network, the weight updates are deterministic and if it is a probabilistic model, then the outputs are simply calculated with a probability of success.
+
+COMPARISON OF FG AND MEMRISTORS
+Simulated smearing of the stochastic neuron function due to the combined effect of subthreshold slope variations and differential summation in floating-gate memory implementation
+Memristor fabrication: Immature
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Combinatorial optimization by weight annealing in memristive hopfeld networks
+
+WEIGHT ANNEALING: IDEA
+The real ground state of the network at any stage is not fixed because the the weights itself is not fixed, the problem is not fixed. But it is eventually. So on average the weight annealing technique acheives the global minima a few updates after the initialization, and then follows the curve of the optimum value. The increasing curve of the global minima is intentional and is caused due to the changing weights.
+
+Prepare a "intuitive" (simple? in this case exponential/linear) energy function that acheives its minima at the minima of the original energy function of the problem.
+<Supplementary>
+

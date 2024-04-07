@@ -1,0 +1,18 @@
+{
+  "ExecutionMD": {
+    "TimeCompleted": "2022-01-31  22:57:54",
+    "ExecutionTime": 0.033,
+    "SolutionType": "Optimal",
+    "Solution": 494,
+    "OneSideOfTheCut": "{  2, 3, 5, 8, 10, 11, 12, 13, 16, 17, 18, 26, 27, 28, 29, 35, 36, 38, 39, 40, 41, 42, 43, 44, 45, 48, 49, 50, 51, 53, 54, 56, 57, 61, 63, 64, 65}",
+    "BabNodes": 1,
+    "RootBound": 494.9,
+    "NumCores": 48
+  },
+  "GraphMD": {
+    "ObjectTypeString": "Graph",
+    "Vertices": 67,
+    "Edges": 925,
+    "Density": 0.418
+  }
+}

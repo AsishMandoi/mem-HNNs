@@ -1,0 +1,186 @@
+%Looking from the top
+%
+% |---------> xaxis
+% |
+% |
+% |
+% ^yaxis (has one extra term for bias)
+%
+%Assume the given hopfield solved in the 3rd xy plane from the top.
+%Transistors in all other layers are in erased state. Weights of the
+%hopfield mapped to the 3rd xy layer
+% k just determines the layer no. ith and jth indices determine the weight
+% between the ith and jth neuron.(i.e. W[i][j]) for simplicity initially
+% the weight matrix is considered to be binary. Neuron states themselves
+% are binary.
+%W[i][j]=0 (programmed state) | W[i][j]=1 (erased state)
+
+TransistorInXplane = 4;
+TransistorInYplane = 5;
+%4x5 matrix in xy plane one additional row for the bias transistors.
+TransistorPerString = 4;%2 switch transistors in the form of GSL and BSL transistors
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+WeightN = [0 140 478 500;140 0 508 552;478 508 0 622;500 552 622 0];
+
+M1 = max(WeightN,[],'all');
+WeightN = WeightN/M1;
+BiasP = [559 600 804 837];
+M2 = max(BiasP,[],'all');
+BiasP = BiasP/M2;
+
+Imax = 5.1494e-6;
+Imin = 102.8708e-9;
+IweightN = WeightN;
+IbiasP = BiasP;
+sz = size(WeightN);
+sz2 = size(BiasP)
+for i=1:sz(1) 
+    for j=1:sz(2)
+        IweightN(i,j) = Imin + (Imax-Imin)*WeightN(i,j);
+    end
+end
+
+for i=1:sz2(2)
+    IbiasP(i) = Imin + (Imax-Imin)*BiasP(i);
+end
+I_threshold_values = [5.1494e-06 5.0903e-06 5.0060e-06 4.8771e-06 4.6578e-06 4.2019e-06 2.6356e-06 102.8708e-09];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Hspice file 
+spfname=sprintf('Hopfield_nand.sp');  %define file name
+fid = fopen(spfname, 'wt'); %open target spice file
+
+fprintf(fid,'*NAND_FLASH for Hopfield Network\n');
+fprintf(fid,'*A network of %d transistors in one string and %d x %d transistors in x-y plane\n',TransistorPerString,TransistorInXplane,TransistorInYplane);
+fprintf(fid,'\nVreadp SL0 gnd 0.5\n');
+fprintf(fid,'Vreadn SL1 gnd 0.5\n');
+fprintf(fid,'.MODEL NCH0 NMOS LEVEL=72 VERSION=110 BULKMOD=1 GEOMOD=3 L=50n D=10n NBODY=1e21 EOT=28n U0=2e-2 NSD=2e25 RDSMOD=0 PHIG=4.8 RGATEMOD=1 RGEOMOD=1 CGEOMOD=1 RDSW=350 DELVTRAND=677.345m\n');
+fprintf(fid,'.MODEL NCH1 NMOS LEVEL=72 VERSION=110 BULKMOD=1 GEOMOD=3 L=50n D=10n NBODY=1e21 EOT=28n U0=2e-2 NSD=2e25 RDSMOD=0 PHIG=4.8 RGATEMOD=1 RGEOMOD=1 CGEOMOD=1 RDSW=350 DELVTRAND=177.345m\n');
+fprintf(fid,'.MODEL NCH2 NMOS LEVEL=72 VERSION=110 BULKMOD=1 GEOMOD=3 L=50n D=10n NBODY=1e21 EOT=28n U0=2e-2 NSD=2e25 RDSMOD=0 PHIG=4.8 RGATEMOD=1 RGEOMOD=1 CGEOMOD=1 RDSW=350 DELVTRAND=-322.655m\n');
+fprintf(fid,'.MODEL NCH3 NMOS LEVEL=72 VERSION=110 BULKMOD=1 GEOMOD=3 L=50n D=10n NBODY=1e21 EOT=28n U0=2e-2 NSD=2e25 RDSMOD=0 PHIG=4.8 RGATEMOD=1 RGEOMOD=1 CGEOMOD=1 RDSW=350 DELVTRAND=-822.655m\n');
+fprintf(fid,'.MODEL NCH4 NMOS LEVEL=72 VERSION=110 BULKMOD=1 GEOMOD=3 L=50n D=10n NBODY=1e21 EOT=28n U0=2e-2 NSD=2e25 RDSMOD=0 PHIG=4.8 RGATEMOD=1 RGEOMOD=1 CGEOMOD=1 RDSW=350 DELVTRAND=-1322.655m\n');
+fprintf(fid,'.MODEL NCH5 NMOS LEVEL=72 VERSION=110 BULKMOD=1 GEOMOD=3 L=50n D=10n NBODY=1e21 EOT=28n U0=2e-2 NSD=2e25 RDSMOD=0 PHIG=4.8 RGATEMOD=1 RGEOMOD=1 CGEOMOD=1 RDSW=350 DELVTRAND=-1822.655m\n');
+fprintf(fid,'.MODEL NCH6 NMOS LEVEL=72 VERSION=110 BULKMOD=1 GEOMOD=3 L=50n D=10n NBODY=1e21 EOT=28n U0=2e-2 NSD=2e25 RDSMOD=0 PHIG=4.8 RGATEMOD=1 RGEOMOD=1 CGEOMOD=1 RDSW=350 DELVTRAND=-2322.655m\n');
+fprintf(fid,'.MODEL NCH7 NMOS LEVEL=72 VERSION=110 BULKMOD=1 GEOMOD=3 L=50n D=10n NBODY=1e21 EOT=28n U0=2e-2 NSD=2e25 RDSMOD=0 PHIG=4.8 RGATEMOD=1 RGEOMOD=1 CGEOMOD=1 RDSW=350 DELVTRAND=-2822.655m\n');
+fprintf(fid,'Vselectp G03 gnd 3.5\n');
+fprintf(fid,'Vselectn G13 gnd 3.5\n');
+fprintf(fid,'\n');
+
+
+Tz = TransistorPerString+2;
+Ty = TransistorInYplane;
+Tx = TransistorInXplane;
+Mapp = 0;
+
+for i=1:Tx
+    fprintf(fid,'VBL0%d BL0%d gnd 0\n',i,i);
+    fprintf(fid,'VBL1%d BL1%d gnd 0\n',i,i);
+end
+
+for k=1:Tz
+    if(k==1)
+        for j=1:Ty
+            if(j<Ty)
+                x0 = rand;
+                if(x0<0.5)
+                    fprintf(fid,'VrndPass BSL0%d gnd 0\n',j);
+                    fprintf(fid,'Vpass BSL1%d gnd 8\n',j);
+                else
+                    fprintf(fid,'VrndPass BSL0%d gnd 8\n',j);
+                    fprintf(fid,'Vpass BSL1%d gnd 8\n',j);
+                end
+            else
+                fprintf(fid,'Vpass BSL0%d gnd 8\n',j);
+                fprintf(fid,'Vpass BSL1%d gnd 8\n',j);
+            end
+        end
+    end
+    fprintf(fid,'\n');
+    if(k>1 && k<Tz && k~=3)
+        fprintf(fid,'Vpass G0%d gnd 8\n',k);
+        fprintf(fid,'Vpass G1%d gnd 8\n',k);
+    end
+    fprintf(fid,'\n');
+    if(k==Tz)
+        for j=1:Ty
+            fprintf(fid,'Vpass SSL0%d gnd 8\n',j);
+            fprintf(fid,'Vpass SSL1%d gnd 8\n',j);
+        end
+    end
+end
+
+fprintf(fid,'\n*______+ve Weight Mapping_________\n');
+fprintf(fid,'\n');
+
+
+for i=1:Tx
+    for j=1:Ty
+        for k=1:Tz
+            a = k-1;
+            if(k==1)
+                fprintf(fid,'M%d%d%d%d BL%d%d BSL%d%d S%d%d%d%d S%d%d%d%d NCH0\n',Mapp,k,j,i,Mapp,i,Mapp,j,Mapp,k,j,i,Mapp,k,j,i);
+            end
+            if(k>1 && k<Tz) 
+                if(k~=3)
+                    fprintf(fid,'M%d%d%d%d S%d%d%d%d G%d%d S%d%d%d%d S%d%d%d%d NCH0\n',Mapp,k,j,i,Mapp,a,j,i,Mapp,k,Mapp,k,j,i,Mapp,k,j,i);
+                else
+                    if(j==Ty)
+                        I_val = IbiasP(i);
+                        test = abs(I_threshold_values - I_val);
+                        [val,idx] = min(test);
+                        fprintf(fid,'M%d%d%d%d S%d%d%d%d G%d%d S%d%d%d%d S%d%d%d%d NCH%d\n',Mapp,k,j,i,Mapp,a,j,i,Mapp,k,Mapp,k,j,i,Mapp,k,j,i,idx-1);
+                    end
+                    if(j<Ty)
+                        fprintf(fid,'M%d%d%d%d S%d%d%d%d G%d%d S%d%d%d%d S%d%d%d%d NCH0\n',Mapp,k,j,i,Mapp,a,j,i,Mapp,k,Mapp,k,j,i,Mapp,k,j,i);
+                    end
+                end
+            end
+            if(k==Tz)
+                fprintf(fid,'M%d%d%d%d S%d%d%d%d SSL%d%d SL%d SL%d NCH0\n',Mapp,k,j,i,Mapp,a,j,i,Mapp,j,Mapp,Mapp);
+            end
+        end
+        fprintf(fid,'*One String done\n');
+    end 
+        fprintf(fid,'*One yz plane done\n');
+end
+fprintf(fid,'*Entire xyz plane done\n');
+
+
+fprintf(fid,'*______-ve Weight Mapping_________\n');
+Mapn = 1;
+for i=1:Tx
+    for j=1:Ty
+        for k=1:Tz
+            a = k-1;
+            if(k==1)
+                fprintf(fid,'M%d%d%d%d BL%d%d BSL%d%d S%d%d%d%d S%d%d%d%d NCH0\n',Mapn,k,j,i,Mapn,i,Mapn,k,Mapn,k,j,i,Mapn,k,j,i);
+            end
+            if(k>1 && k<Tz) 
+                if(k~=3)
+                    fprintf(fid,'M%d%d%d%d S%d%d%d%d G%d%d S%d%d%d%d S%d%d%d%d NCH0\n',Mapn,k,j,i,Mapn,a,j,i,Mapn,k,Mapn,k,j,i,Mapn,k,j,i);
+                else
+                    if(j==Ty)
+                        fprintf(fid,'M%d%d%d%d S%d%d%d%d G%d%d S%d%d%d%d S%d%d%d%d NCH0\n',Mapn,k,j,i,Mapn,a,j,i,Mapn,k,Mapn,k,j,i,Mapn,k,j,i);
+                    end
+                    if(j<Ty)
+                        I_val = IweightN(i,j);
+                        test = abs(I_threshold_values - I_val);
+                        [val,idx] = min(test);
+                        fprintf(fid,'M%d%d%d%d S%d%d%d%d G%d%d S%d%d%d%d S%d%d%d%d NCH%d\n',Mapn,k,j,i,Mapn,a,j,i,Mapn,k,Mapn,k,j,i,Mapn,k,j,i,idx-1);
+                    end
+                end
+            end
+            if(k==Tz)
+                fprintf(fid,'M%d%d%d%d S%d%d%d%d SSL%d%d SL%d SL%d NCH0\n',Mapn,k,j,i,Mapn,a,j,i,Mapn,j,Mapn,Mapn);
+            end
+        end
+        fprintf(fid,'*One String done\n');
+    end 
+        fprintf(fid,'*One yz plane done\n');
+end
+fprintf(fid,'*Entire xyz plane done\n');
+
+fprintf(fid,'OPTION POST=2\n');
+fprintf(fid,'PRINT I(VBL01)\n');
+fprintf(fid,'PRINT I(VBL02)\n');
+fprintf(fid,'.op');

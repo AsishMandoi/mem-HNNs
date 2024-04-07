@@ -1,0 +1,7 @@
+dataset, optimal(or approx.) solution, obtained solution, time to solution (s)
+mc_21_199,109,109,4.25
+mc_50_156,1762,1710,9.98
+mc_63_1729,956,956,10.97
+mc_100_242,197,192,13.12
+mc_101_5006,4322,4322,12.69
+mc_800_4667,3044,2881,357.67

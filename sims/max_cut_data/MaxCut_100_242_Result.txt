@@ -1,0 +1,16 @@
+{
+  "ExecutionMD": {
+    "ExecutionTime": 1.801,
+    "SolutionType": "Optimal",
+    "RelativeGap": 0.0,
+    "Solution": 197.0,
+    "OneSideOfTheCut": "(1, 2, 6, 7, 8, 12, 15, 16, 21, 22, 23, 24, 29, 30, 32, 35, 36, 38, 42, 43, 44, 45, 47, 53, 56, 59, 60, 61, 65, 68, 69, 70, 71, 74, 75, 76, 77, 78, 80, 81, 84, 85, 86, 93, 96, 98, 99)",
+    "BabNodes": 1,
+    "NumCores": 96
+  },
+  "GraphMD": {
+    "Vertices": 100,
+    "Edges": 242,
+    "Density": 0.049
+  }
+}
